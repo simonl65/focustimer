@@ -1,5 +1,5 @@
 use tauri::Manager;
-use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -18,8 +18,9 @@ pub fn run() {
                 api.prevent_close();
 
                 app.dialog()
-                    .confirm("Are you sure you want to quit? Your timer will stop.")
+                    .message("Are you sure you want to quit? Your timer will stop.")
                     .title("Exit Focus Timer")
+                    .buttons(MessageDialogButtons::YesNo)
                     .show(move |answer| {
                         if answer {
                             app.exit(0);
