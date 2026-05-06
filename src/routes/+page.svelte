@@ -12,14 +12,6 @@
   let activePanel = $state<'none' | 'settings' | 'help'>('none');
 
   onMount(() => {
-    // Listen for events from the system tray
-    const unlistenSettings = listen('show-settings', () => {
-      activePanel = 'settings';
-    });
-    const unlistenHelp = listen('show-help', () => {
-      activePanel = 'help';
-    });
-
     // Handle timer completion
     timer.onCompleteCallback = async () => {
       const window = getCurrentWindow();
@@ -35,11 +27,6 @@
       
       // Flash the UI as well
       flashUI();
-    };
-
-    return () => {
-      unlistenSettings.then(f => f());
-      unlistenHelp.then(f => f());
     };
   });
 

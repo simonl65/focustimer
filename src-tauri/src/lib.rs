@@ -1,4 +1,5 @@
-use tauri::{Emitter, Manager};
+use tauri::{AppHandle, Emitter, Manager};
+use tauri_plugin_dialog::{DialogExt, MessageDialogBuilder, MessageDialogKind};
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
@@ -9,88 +10,25 @@ fn greet(name: &str) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
-        .setup(|app| {
-            #[cfg(desktop)]
-            {
-                use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
-                use tauri::menu::{Menu, MenuItem};
-
-                let quit_i = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-                let show_i = MenuItem::with_id(app, "show", "Show", true, None::<&str>)?;
-                let settings_i = MenuItem::with_id(app, "settings", "Settings", true, None::<&str>)?;
-                let help_i = MenuItem::with_id(app, "help", "Help", true, None::<&str>)?;
-
-                let menu = Menu::with_items(app, &[&show_i, &settings_i, &help_i, &quit_i])?;
-
-                let _tray = TrayIconBuilder::new()
-                    .icon(app.default_window_icon().unwrap().clone())
-                    .menu(&menu)
-                    .show_menu_on_left_click(false)
-                    .on_menu_event(|app, event| {
-                        match event.id.as_ref() {
-                            "quit" => {
-                                app.exit(0);
-                            }
-                            "show" => {
-                                if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
-                                }
-                            }
-                            "settings" => {
-                                app.emit("show-settings", ()).unwrap();
-                                if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
-                                }
-                            }
-                            "help" => {
-                                app.emit("show-help", ()).unwrap();
-                                if let Some(window) = app.get_webview_window("main") {
-                                    let _ = window.show();
-                                    let _ = window.set_focus();
-                                }
-                            }
-                            _ => {}
-                        }
-                    })
-                    .on_tray_icon_event(|tray, event| {
-                        if let TrayIconEvent::Click {
-                            button: MouseButton::Left,
-                            button_state: MouseButtonState::Up,
-                            ..
-                        } = event
-                        {
-                            let app = tray.app_handle();
-                            if let Some(window) = app.get_webview_window("main") {
-                                let _ = window.show();
-                                let _ = window.set_focus();
-                            }
-                        }
-                    })
-                    .build(app)?;
-            }
-
-            Ok(())
-        })
         .on_window_event(|window, event| match event {
             tauri::WindowEvent::CloseRequested { api, .. } => {
-                window.hide().unwrap();
+                let app = window.app_handle().clone();
                 api.prevent_close();
+
+                app.dialog()
+                    .message("Are you sure you want to quit? Your timer will stop.")
+                    .title("Exit Focus Timer")
+                    .kind(MessageDialogKind::Info) // Using Info as Question might not be in all versions
+                    .buttons(tauri_plugin_dialog::MessageDialogButtons::YesNo)
+                    .show(move |answer| {
+                        if answer {
+                            app.exit(0);
+                        }
+                    });
             }
-            tauri::WindowEvent::Focused(false) => {
-                // Optional: could hide on loss of focus if desired, 
-                // but let's stick to explicit minimize/close for now.
-            }
-            _ => {
-                // If the window is minimized, hide it so it only shows in the tray
-                if let tauri::WindowEvent::Resized(_) = event {
-                    if window.is_minimized().unwrap_or(false) {
-                        window.hide().unwrap();
-                    }
-                }
-            }
+            _ => {}
         })
         .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())

@@ -16,7 +16,7 @@
         "width": 400,
         "height": 600,
         "resizable": true,
-        "skipTaskbar": true
+        "skipTaskbar": false
       }
     ],
     "security": {
