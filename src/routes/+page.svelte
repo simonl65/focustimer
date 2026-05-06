@@ -10,13 +10,10 @@
 
   let activePanel = $state<'none' | 'settings' | 'help'>('none');
   let debugMessage = $state('');
-  let audio: HTMLAudioElement;
 
   onMount(() => {
-    audio = new Audio('/beep.ogg');
-    
     timer.onCompleteCallback = async () => {
-      // Play sound immediately, then perform window operations
+      
       if (settings.soundEnabled) {
         playBeep();
       }
@@ -33,7 +30,8 @@
 
   async function playBeep() {
     try {
-      audio.currentTime = 0;
+      const fileName = `/${settings.selectedSound}`;
+      const audio = new Audio(fileName);
       await audio.play();
     } catch (e) {
       debugMessage = "Audio Error: " + e;
@@ -52,7 +50,7 @@
 <div class="app-container" class:flashing={isFlashing}>
   <header>
     <button class="icon-btn" onclick={() => activePanel = 'help'} title="Help">?</button>
-    <h1>FOCUS</h1>
+    <h1>&nbsp;FOCUS</h1>
     <button class="icon-btn" onclick={() => activePanel = 'settings'} title="Settings">⚙</button>
   </header>
 

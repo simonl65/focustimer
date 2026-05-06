@@ -10,6 +10,17 @@
     '#ec4899'  // Pink
   ];
 
+  const sounds = [
+    { name: 'Default', file: 'beeper_emergency_call.ogg' },
+    { name: 'Alarm Clock', file: 'digital.ogg' },
+    { name: 'Bugle Tune', file: 'bugle_tune.ogg' },
+    { name: 'Boing', file: 'cartoon_boing.ogg' },
+    { name: 'Cowbell', file: 'cowbell_ringing.ogg' },
+    { name: 'Emergency Siren', file: 'emergency_siren_short_burst.ogg' },
+    { name: 'Radiation', file: 'radiation_meter.ogg' },
+    { name: 'Slide Whistle', file: 'slide_whistle.ogg' },
+  ];
+
   let { onclose } = $props();
 </script>
 
@@ -47,13 +58,24 @@
 
   <div class="section">
     <h3>Sound</h3>
-    <label class="switch-container">
-      <span class="label-text">{settings.soundEnabled ? 'Beep Enabled' : 'Beep Disabled'}</span>
+    <label class="switch-container" style="margin-bottom: 1rem;">
+      <span class="label-text">{settings.soundEnabled ? 'Enabled' : 'Disabled'}</span>
       <div class="switch">
         <input type="checkbox" checked={settings.soundEnabled} onchange={() => settings.toggleSound()}>
         <span class="slider"></span>
       </div>
     </label>
+    
+    <select 
+      value={settings.selectedSound} 
+      onchange={(e) => settings.setSelectedSound((e.target as HTMLSelectElement).value)}
+      disabled={!settings.soundEnabled}
+      class="sound-select"
+    >
+      {#each sounds as sound}
+        <option value={sound.file}>{sound.name}</option>
+      {/each}
+    </select>
   </div>
 </div>
 
@@ -115,7 +137,6 @@
     transform: scale(1.1);
   }
 
-  /* Modern Switch Styles */
   .switch-container {
     display: flex;
     justify-content: space-between;
@@ -132,11 +153,7 @@
     height: 26px;
   }
 
-  .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
+  .switch input { opacity: 0; width: 0; height: 0; }
 
   .slider {
     position: absolute;
@@ -162,11 +179,27 @@
     border-radius: 50%;
   }
 
-  input:checked + .slider {
-    background-color: var(--primary-color);
+  input:checked + .slider { background-color: var(--primary-color); }
+  input:checked + .slider:before { transform: translateX(24px); }
+
+  .sound-select {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 12px;
+    border: 2px solid var(--track-color);
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right .7em top 50%;
+    background-size: .65em auto;
   }
 
-  input:checked + .slider:before {
-    transform: translateX(24px);
+  .sound-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
   }
 </style>

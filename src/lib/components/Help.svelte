@@ -22,7 +22,7 @@
       <li>Drag the circular selector clockwise to set your focus time (up to 60 minutes).</li>
       <li>Click <strong>PLAY</strong> to start the countdown.</li>
       <li>The selector will re-trace anti-clockwise as time passes.</li>
-      <li>The app will beep when time is up.</li>
+      <li>The app will make a sound when time is up.</li>
     </ul>
   </div>
   <div class="version">v{version}</div>

@@ -2,6 +2,7 @@ export class SettingsState {
   primaryColor = $state('#3b82f6');
   soundEnabled = $state(true);
   darkMode = $state(false);
+  selectedSound = $state('beep.ogg');
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -11,11 +12,13 @@ export class SettingsState {
       const savedSound = localStorage.getItem('soundEnabled');
       if (savedSound !== null) this.soundEnabled = savedSound === 'true';
 
+      const savedSelectedSound = localStorage.getItem('selectedSound');
+      if (savedSelectedSound) this.selectedSound = savedSelectedSound;
+
       const savedDark = localStorage.getItem('darkMode');
       if (savedDark !== null) {
         this.darkMode = savedDark === 'true';
       } else {
-        // Default to system preference if no saved setting
         this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
       }
       
@@ -46,28 +49,24 @@ export class SettingsState {
     this.updateCssVariables();
   }
 
-  async playSound() {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
+  playSoundFile(soundName: string) {
+    const audio = new Audio(`/${soundName}`);
+    audio.play().catch(e => console.error("Preview sound failed", e));
+  }
+
+  setSelectedSound(sound: string) {
+    this.selectedSound = sound;
+    this.save();
+    if (this.soundEnabled) {
+      this.playSoundFile(sound);
     }
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.2);
   }
 
   toggleSound() {
     this.soundEnabled = !this.soundEnabled;
     this.save();
     if (this.soundEnabled) {
-      this.playSound();
+      this.playSoundFile(this.selectedSound);
     }
   }
 
@@ -82,6 +81,7 @@ export class SettingsState {
       localStorage.setItem('primaryColor', this.primaryColor);
       localStorage.setItem('soundEnabled', this.soundEnabled.toString());
       localStorage.setItem('darkMode', this.darkMode.toString());
+      localStorage.setItem('selectedSound', this.selectedSound);
     }
   }
 }
