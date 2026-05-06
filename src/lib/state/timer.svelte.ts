@@ -18,7 +18,7 @@ export class TimerState {
 
   onCompleteCallback: (() => void) | undefined = undefined;
 
-  constructor() {}
+  constructor() { }
 
   setTime(minutes: number) {
     if (this.status !== 'idle') return;
@@ -28,12 +28,14 @@ export class TimerState {
 
   start() {
     if (this.status === 'running' || this.remainingSeconds <= 0) return;
-    
+
     this.status = 'running';
     this.interval = window.setInterval(() => {
       if (this.remainingSeconds > 0) {
         this.remainingSeconds -= 1;
-      } else {
+      }
+
+      if (this.remainingSeconds <= 0) {
         this.stop();
         this.onComplete();
       }
@@ -63,6 +65,7 @@ export class TimerState {
   }
 
   onComplete() {
+    console.log("Timer State: onComplete called");
     if (this.onCompleteCallback) this.onCompleteCallback();
   }
 }

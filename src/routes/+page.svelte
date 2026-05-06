@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { listen } from '@tauri-apps/api/event';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import CircularSelector from '$lib/components/CircularSelector.svelte';
   import Controls from '$lib/components/Controls.svelte';
@@ -10,43 +9,35 @@
   import { settings } from '$lib/state/settings.svelte';
 
   let activePanel = $state<'none' | 'settings' | 'help'>('none');
+  let debugMessage = $state('');
+  let audio: HTMLAudioElement;
 
   onMount(() => {
-    // Handle timer completion
+    audio = new Audio('/beep.ogg');
+    
     timer.onCompleteCallback = async () => {
-      const window = getCurrentWindow();
-      await window.show();
-      await window.setFocus();
-
+      // Play sound immediately, then perform window operations
       if (settings.soundEnabled) {
         playBeep();
       }
-      
-      // Flash window / Request attention
-      await window.requestUserAttention(1); // 1 = Critical (flash until focused)
-      
-      // Flash the UI as well
-      flashUI();
+
+      setTimeout(async () => {
+        const window = getCurrentWindow();
+        await window.show();
+        await window.setFocus();
+        await window.requestUserAttention(1);
+        flashUI();
+      }, 200);
     };
   });
 
-  function playBeep() {
-    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); // A5
-    
-    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.1);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1);
-
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 1);
+  async function playBeep() {
+    try {
+      audio.currentTime = 0;
+      await audio.play();
+    } catch (e) {
+      debugMessage = "Audio Error: " + e;
+    }
   }
 
   let isFlashing = $state(false);
@@ -54,7 +45,7 @@
     isFlashing = true;
     setTimeout(() => {
       isFlashing = false;
-    }, 5000); // Flash for 5 seconds
+    }, 5000);
   }
 </script>
 
@@ -67,6 +58,7 @@
 
   <CircularSelector />
   <Controls />
+  <p style="font-size: 0.8rem; opacity: 0.5;">{debugMessage}</p>
 
   {#if activePanel !== 'none'}
     <div class="overlay" onclick={() => activePanel = 'none'}>

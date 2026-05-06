@@ -35,6 +35,7 @@
     if (!isDragging || timer.status !== 'idle') return;
     
     const angle = calculateAngle(e.clientX, e.clientY);
+    // Map angle to integer minutes (0 to 60)
     const minutes = Math.round((angle / (2 * Math.PI)) * 60);
     
     // Clamp between 0 and 60
@@ -71,6 +72,8 @@
       onpointerdown={handlePointerDown}
       onpointermove={handlePointerMove}
       onpointerup={handlePointerUp}
+      role="button"
+      aria-label="Set timer duration"
       style="cursor: {timer.status === 'idle' ? 'pointer' : 'default'}"
     />
     
@@ -101,6 +104,8 @@
         onpointerdown={handlePointerDown}
         onpointermove={handlePointerMove}
         onpointerup={handlePointerUp}
+        role="button"
+        aria-label="Drag to set timer"
       />
     {/if}
   </svg>
