@@ -1,5 +1,13 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { getVersion } from '@tauri-apps/api/app';
+
+  let version = $state('');
   let { onclose } = $props();
+
+  onMount(async () => {
+    version = await getVersion();
+  });
 </script>
 
 <div class="panel">
@@ -14,12 +22,10 @@
       <li>Drag the circular selector clockwise to set your focus time (up to 60 minutes).</li>
       <li>Click <strong>PLAY</strong> to start the countdown.</li>
       <li>The selector will re-trace anti-clockwise as time passes.</li>
-      <li>The app will flash and beep when time is up.</li>
+      <li>The app will beep when time is up.</li>
     </ul>
-    
-    <p><strong>System Tray:</strong></p>
-    <p>You can minimize the app to the system tray. Right-click the icon to show the window, settings, or quit.</p>
   </div>
+  <div class="version">v{version}</div>
 </div>
 
 <style>
@@ -58,6 +64,7 @@
   .content {
     line-height: 1.6;
     font-size: 1rem;
+    margin-bottom: 1rem;
   }
 
   ul {
@@ -67,5 +74,11 @@
 
   li {
     margin-bottom: 0.5rem;
+  }
+
+  .version {
+    font-size: 0.8rem;
+    opacity: 0.4;
+    text-align: center;
   }
 </style>
