@@ -74,6 +74,24 @@ pub fn run() {
 
             Ok(())
         })
+        .on_window_event(|window, event| match event {
+            tauri::WindowEvent::CloseRequested { api, .. } => {
+                window.hide().unwrap();
+                api.prevent_close();
+            }
+            tauri::WindowEvent::Focused(false) => {
+                // Optional: could hide on loss of focus if desired, 
+                // but let's stick to explicit minimize/close for now.
+            }
+            _ => {
+                // If the window is minimized, hide it so it only shows in the tray
+                if let tauri::WindowEvent::Resized(_) = event {
+                    if window.is_minimized().unwrap_or(false) {
+                        window.hide().unwrap();
+                    }
+                }
+            }
+        })
         .invoke_handler(tauri::generate_handler![greet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

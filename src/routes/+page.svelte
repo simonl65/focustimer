@@ -22,11 +22,14 @@
 
     // Handle timer completion
     timer.onCompleteCallback = async () => {
+      const window = getCurrentWindow();
+      await window.show();
+      await window.setFocus();
+
       if (settings.soundEnabled) {
         playBeep();
       }
       
-      const window = getCurrentWindow();
       // Flash window / Request attention
       await window.requestUserAttention(1); // 1 = Critical (flash until focused)
       

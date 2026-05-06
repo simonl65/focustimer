@@ -15,7 +15,8 @@
         "title": "Focus Timer",
         "width": 400,
         "height": 600,
-        "resizable": false
+        "resizable": true,
+        "skipTaskbar": true
       }
     ],
     "security": {
