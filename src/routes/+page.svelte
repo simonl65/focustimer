@@ -98,9 +98,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem;
+    padding: 1.5rem;
     box-sizing: border-box;
     transition: background-color 0.3s;
+    justify-content: space-between;
   }
 
   header {
@@ -108,7 +109,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
   }
 
   h1 {

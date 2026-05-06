@@ -28,7 +28,7 @@
     if (timer.status !== 'idle') return;
     isDragging = true;
     handlePointerMove(e);
-    (e.target as Element).setPointerCapture(e.pointerId);
+    (e.currentTarget as Element).setPointerCapture(e.pointerId);
   }
 
   function handlePointerMove(e: PointerEvent) {
@@ -47,8 +47,6 @@
   }
 
   // Dash offset represents the "empty" part of the circle
-  // When timer is full (1.0), offset is 0
-  // When timer is empty (0.0), offset is circumference
   let dashOffset = $derived(circumference * (1 - timer.visualProgress));
 
   // Handle position
@@ -61,12 +59,8 @@
 <div class="selector-container">
   <svg
     bind:this={svgElement}
-    onpointerdown={handlePointerDown}
-    onpointermove={handlePointerMove}
-    onpointerup={handlePointerUp}
     viewBox="0 0 {size} {size}"
     class:dragging={isDragging}
-    class:interactive={timer.status === 'idle'}
   >
     <!-- Background Track -->
     <circle
@@ -74,6 +68,10 @@
       cy={center}
       r={radius}
       class="track"
+      onpointerdown={handlePointerDown}
+      onpointermove={handlePointerMove}
+      onpointerup={handlePointerUp}
+      style="cursor: {timer.status === 'idle' ? 'pointer' : 'default'}"
     />
     
     <!-- Progress Track (Trail) -->
@@ -85,26 +83,26 @@
       style:stroke-dasharray={circumference}
       style:stroke-dashoffset={dashOffset}
       transform="rotate(-90 {center} {center})"
+      pointer-events="none"
     />
 
-    <!-- Handle -->
+    <!-- Time Display in Center -->
+    <text x={center} y={center} class="time-text" dominant-baseline="middle" text-anchor="middle" pointer-events="none">
+      {timer.displayTime}
+    </text>
+
+    <!-- Handle (Last so it's on top) -->
     {#if timer.status === 'idle'}
       <circle
         cx={handlePos.x}
         cy={handlePos.y}
         r="14"
         class="handle"
+        onpointerdown={handlePointerDown}
+        onpointermove={handlePointerMove}
+        onpointerup={handlePointerUp}
       />
     {/if}
-
-    <!-- Time Display in Center -->
-    <text x={center} y={center} class="time-text" dominant-baseline="middle" text-anchor="middle">
-      {timer.displayTime}
-    </text>
-    
-    <text x={center} y={center + 40} class="status-text" dominant-baseline="middle" text-anchor="middle">
-      {timer.status === 'idle' ? 'SET' : timer.status.toUpperCase()}
-    </text>
   </svg>
 </div>
 
@@ -115,25 +113,21 @@
     align-items: center;
     width: 100%;
     user-select: none;
+    padding: 1rem 0;
   }
 
   svg {
     width: 100%;
-    max-width: 400px;
+    max-width: 300px;
     height: auto;
-    cursor: default;
     touch-action: none;
-  }
-
-  svg.interactive {
-    cursor: pointer;
   }
 
   .track {
     fill: none;
     stroke: var(--track-color);
-    stroke-width: 15;
-    opacity: 1; /* Make track fully visible but light grey */
+    stroke-width: 25; /* Wider for easier clicking */
+    opacity: 1;
   }
 
   .progress {
@@ -141,7 +135,6 @@
     stroke: var(--primary-color);
     stroke-width: 15;
     stroke-linecap: round;
-    /* Remove transition during drag for better feel */
     transition: stroke-dashoffset 0.1s linear;
   }
 
@@ -153,26 +146,19 @@
     fill: white;
     stroke: var(--primary-color);
     stroke-width: 4;
-    cursor: grab;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
     transition: r 0.2s ease;
+    cursor: grab;
   }
 
   .dragging .handle {
+    r: 16;
     cursor: grabbing;
-    r: 16; /* Slightly larger instead of transform scale */
   }
 
   .time-text {
-    font-size: 3.5rem;
-    font-weight: 700;
+    font-size: 4rem;
+    font-weight: 800;
     fill: var(--text-color);
-  }
-
-  .status-text {
-    font-size: 1.1rem;
-    font-weight: 600;
-    fill: var(--text-color);
-    opacity: 0.5;
   }
 </style>

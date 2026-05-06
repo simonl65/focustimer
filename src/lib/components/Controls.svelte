@@ -2,31 +2,52 @@
   import { timer } from '../state/timer.svelte';
 </script>
 
-<div class="controls">
-  {#if timer.status === 'idle' || timer.status === 'paused'}
-    <button 
-      onclick={() => timer.start()} 
-      disabled={timer.remainingSeconds <= 0}
-      class="primary"
-    >
-      PLAY
-    </button>
-  {:else}
-    <button onclick={() => timer.pause()} class="secondary">
-      PAUSE
-    </button>
-  {/if}
+<div class="controls-wrapper">
+  <div class="status-display">
+    {timer.status === 'idle' ? 'SET' : timer.status.toUpperCase()}
+  </div>
 
-  <button onclick={() => timer.reset()} class="ghost" disabled={timer.status === 'idle'}>
-    RESET
-  </button>
+  <div class="controls">
+    {#if timer.status === 'idle' || timer.status === 'paused'}
+      <button 
+        onclick={() => timer.start()} 
+        disabled={timer.remainingSeconds <= 0}
+        class="primary"
+      >
+        PLAY
+      </button>
+    {:else}
+      <button onclick={() => timer.pause()} class="secondary">
+        PAUSE
+      </button>
+    {/if}
+
+    <button onclick={() => timer.reset()} class="ghost" disabled={timer.status === 'idle'}>
+      RESET
+    </button>
+  </div>
 </div>
 
 <style>
+  .controls-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .status-display {
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.1rem;
+    color: var(--text-color);
+    opacity: 0.6;
+  }
+
   .controls {
     display: flex;
     gap: 1rem;
-    margin-top: 2rem;
   }
 
   button {
