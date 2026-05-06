@@ -160,5 +160,7 @@
     font-size: 4rem;
     font-weight: 800;
     fill: var(--text-color);
+    user-select: none;
+    -webkit-user-select: none;
   }
 </style>

@@ -5,7 +5,7 @@
 <div class="panel">
   <div class="header">
     <h2>Help</h2>
-    <button class="close" onclick={onclose}>&times;</button>
+    <button class="close" onclick={onclose} aria-label="Close help panel">&times;</button>
   </div>
 
   <div class="content">
@@ -24,12 +24,14 @@
 
 <style>
   .panel {
-    background: white;
+    background: var(--panel-bg);
+    color: var(--text-color);
     padding: 2rem;
-    border-radius: 20px;
+    border-radius: 24px;
     width: 90%;
     max-width: 350px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
   }
 
   .header {
@@ -39,7 +41,7 @@
     margin-bottom: 1.5rem;
   }
 
-  h2 { margin: 0; font-size: 1.5rem; }
+  h2 { margin: 0; font-size: 1.5rem; font-weight: 800; }
 
   .close {
     background: none;
@@ -47,12 +49,15 @@
     font-size: 2rem;
     cursor: pointer;
     line-height: 1;
+    color: var(--text-color);
+    opacity: 0.5;
   }
+
+  .close:hover { opacity: 1; }
 
   .content {
     line-height: 1.6;
-    font-size: 0.95rem;
-    color: #1f2937;
+    font-size: 1rem;
   }
 
   ul {

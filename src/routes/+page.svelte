@@ -139,12 +139,13 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.4);
+    background: var(--overlay-bg);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
     backdrop-filter: blur(4px);
+    transition: background-color 0.3s ease;
   }
 
   .panel-wrapper {
