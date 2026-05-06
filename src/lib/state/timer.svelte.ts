@@ -4,8 +4,11 @@ export class TimerState {
   status = $state<'idle' | 'running' | 'paused'>('idle');
   interval: number | undefined = undefined;
 
-  // Progress is 1 when full (selected time) and counts down to 0
+  // Progress relative to the current session (for potential other uses)
   progress = $derived(this.totalSeconds > 0 ? this.remainingSeconds / this.totalSeconds : 0);
+
+  // Visual progress relative to the full 60-minute circle (3600 seconds)
+  visualProgress = $derived(this.remainingSeconds / 3600);
 
   displayTime = $derived(
     `${Math.floor(this.remainingSeconds / 60).toString().padStart(2, '0')}:${(this.remainingSeconds % 60).toString().padStart(2, '0')}`

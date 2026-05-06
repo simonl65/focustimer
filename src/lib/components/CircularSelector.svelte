@@ -49,16 +49,22 @@
   // Dash offset represents the "empty" part of the circle
   // When timer is full (1.0), offset is 0
   // When timer is empty (0.0), offset is circumference
-  let dashOffset = $derived(circumference * (1 - timer.progress));
+  let dashOffset = $derived(circumference * (1 - timer.visualProgress));
+
+  // Handle position
+  let handlePos = $derived({
+    x: center + radius * Math.cos((timer.visualProgress * 2 * Math.PI) - Math.PI / 2),
+    y: center + radius * Math.sin((timer.visualProgress * 2 * Math.PI) - Math.PI / 2)
+  });
 </script>
 
 <div class="selector-container">
   <svg
     bind:this={svgElement}
-    viewBox="0 0 {size} {size}"
     onpointerdown={handlePointerDown}
     onpointermove={handlePointerMove}
     onpointerup={handlePointerUp}
+    viewBox="0 0 {size} {size}"
     class:dragging={isDragging}
     class:interactive={timer.status === 'idle'}
   >
@@ -70,7 +76,7 @@
       class="track"
     />
     
-    <!-- Progress Track -->
+    <!-- Progress Track (Trail) -->
     <circle
       cx={center}
       cy={center}
@@ -80,6 +86,16 @@
       style:stroke-dashoffset={dashOffset}
       transform="rotate(-90 {center} {center})"
     />
+
+    <!-- Handle -->
+    {#if timer.status === 'idle'}
+      <circle
+        cx={handlePos.x}
+        cy={handlePos.y}
+        r="14"
+        class="handle"
+      />
+    {/if}
 
     <!-- Time Display in Center -->
     <text x={center} y={center} class="time-text" dominant-baseline="middle" text-anchor="middle">
@@ -117,6 +133,7 @@
     fill: none;
     stroke: var(--track-color);
     stroke-width: 15;
+    opacity: 1; /* Make track fully visible but light grey */
   }
 
   .progress {
@@ -124,23 +141,38 @@
     stroke: var(--primary-color);
     stroke-width: 15;
     stroke-linecap: round;
-    transition: stroke 0.3s ease;
+    /* Remove transition during drag for better feel */
+    transition: stroke-dashoffset 0.1s linear;
+  }
+
+  .dragging .progress {
+    transition: none;
+  }
+
+  .handle {
+    fill: white;
+    stroke: var(--primary-color);
+    stroke-width: 4;
+    cursor: grab;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    transition: r 0.2s ease;
+  }
+
+  .dragging .handle {
+    cursor: grabbing;
+    r: 16; /* Slightly larger instead of transform scale */
   }
 
   .time-text {
-    font-size: 3rem;
+    font-size: 3.5rem;
     font-weight: 700;
     fill: var(--text-color);
   }
 
   .status-text {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: 1.1rem;
+    font-weight: 600;
     fill: var(--text-color);
-    opacity: 0.6;
-  }
-
-  .dragging .progress {
-    filter: brightness(1.1);
+    opacity: 0.5;
   }
 </style>
