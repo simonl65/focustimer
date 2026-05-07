@@ -11,8 +11,8 @@ A cross platform timer that helps you focus on your tasks.
 1. Add option to display completion message after the task is completed.
    - In a window or full-screen
    - On main screen or all screens
-1. Add ability to choose from several sounds.
 1. Add ability to set a default time.
+1. <strike>Add ability to choose from several sounds.</strike>
 
 ## Development
 
