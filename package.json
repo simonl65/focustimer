@@ -1,7 +1,7 @@
 {
-  "name": "tauri-app",
-  "version": "0.1.0",
-  "description": "",
+  "name": "focustimer",
+  "version": "See tauri.conf.json",
+  "description": "Cross platform focus timer built with SvelteKit and Tauri",
   "type": "module",
   "scripts": {
     "dev": "vite dev",
