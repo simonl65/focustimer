@@ -2,18 +2,20 @@ export class SettingsState {
   primaryColor = $state('#3b82f6');
   soundEnabled = $state(true);
   darkMode = $state(false);
-  selectedSound = $state('beep.ogg');
+  selectedSound = $state('beep.mp3');
 
   constructor() {
     if (typeof window !== 'undefined') {
       const savedColor = localStorage.getItem('primaryColor');
       if (savedColor) this.primaryColor = savedColor;
-      
+
       const savedSound = localStorage.getItem('soundEnabled');
       if (savedSound !== null) this.soundEnabled = savedSound === 'true';
 
       const savedSelectedSound = localStorage.getItem('selectedSound');
-      if (savedSelectedSound) this.selectedSound = savedSelectedSound;
+      // if (savedSelectedSound) {
+      //   this.selectedSound = savedSelectedSound.replace('.ogg', '.mp3');
+      // }
 
       const savedDark = localStorage.getItem('darkMode');
       if (savedDark !== null) {
@@ -21,7 +23,7 @@ export class SettingsState {
       } else {
         this.darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
       }
-      
+
       this.updateCssVariables();
       this.updateDarkMode();
     }
@@ -49,9 +51,21 @@ export class SettingsState {
     this.updateCssVariables();
   }
 
-  playSoundFile(soundName: string) {
-    const audio = new Audio(`/${soundName}`);
-    audio.play().catch(e => console.error("Preview sound failed", e));
+  async playSoundFile(soundName: string) {
+    try {
+      // In Tauri production, directly setting src to a local path can fail 
+      // with NotSupportedError because the protocol doesn't support streaming.
+      // Fetching the blob and using an ObjectURL is much more robust.
+      const response = await fetch(`/${soundName}`);
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+
+      audio.onended = () => URL.revokeObjectURL(url);
+      await audio.play();
+    } catch (e) {
+      console.error("Sound playback failed:", e);
+    }
   }
 
   setSelectedSound(sound: string) {

@@ -9,13 +9,16 @@
   import { settings } from '$lib/state/settings.svelte';
 
   let activePanel = $state<'none' | 'settings' | 'help'>('none');
-  let debugMessage = $state('');
+  let debugMessage = $state('System ready.');
 
   onMount(() => {
     timer.onCompleteCallback = async () => {
+      debugMessage = "Timer finished! Triggering sound...";
       
+      // We call the state's playSoundFile method which now uses the robust 
+      // fetch-to-blob approach to bypass production protocol issues.
       if (settings.soundEnabled) {
-        playBeep();
+        settings.playSoundFile(settings.selectedSound);
       }
 
       setTimeout(async () => {
@@ -24,19 +27,10 @@
         await window.setFocus();
         await window.requestUserAttention(1);
         flashUI();
+        debugMessage = "Timer complete.";
       }, 200);
     };
   });
-
-  async function playBeep() {
-    try {
-      const fileName = `/${settings.selectedSound}`;
-      const audio = new Audio(fileName);
-      await audio.play();
-    } catch (e) {
-      debugMessage = "Audio Error: " + e;
-    }
-  }
 
   let isFlashing = $state(false);
   function flashUI() {
@@ -50,7 +44,7 @@
 <div class="app-container" class:flashing={isFlashing}>
   <header>
     <button class="icon-btn" onclick={() => activePanel = 'help'} title="Help">?</button>
-    <h1>&nbsp;FOCUS</h1>
+    <h1>FOCUS</h1>
     <button class="icon-btn" onclick={() => activePanel = 'settings'} title="Settings">⚙</button>
   </header>
 
