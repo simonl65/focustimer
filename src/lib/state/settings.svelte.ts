@@ -2,7 +2,7 @@ export class SettingsState {
   primaryColor = $state('#3b82f6');
   soundEnabled = $state(true);
   darkMode = $state(false);
-  selectedSound = $state('beep.mp3');
+  selectedSound = $state('digital.mp3');
 
   constructor() {
     if (typeof window !== 'undefined') {
@@ -13,9 +13,9 @@ export class SettingsState {
       if (savedSound !== null) this.soundEnabled = savedSound === 'true';
 
       const savedSelectedSound = localStorage.getItem('selectedSound');
-      // if (savedSelectedSound) {
-      //   this.selectedSound = savedSelectedSound.replace('.ogg', '.mp3');
-      // }
+      if (savedSelectedSound) {
+        this.selectedSound = savedSelectedSound;
+      }
 
       const savedDark = localStorage.getItem('darkMode');
       if (savedDark !== null) {
