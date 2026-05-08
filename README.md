@@ -1,6 +1,6 @@
 # FocusTimer
 
-![WIP](https://img.shields.io/badge/status-Work%20In%20Progress-orange)
+![WIP](https://img.shields.io/badge/status-1.0.3-green)
 
 A cross platform timer that helps you focus on your tasks.
 
