@@ -1,7 +1,6 @@
 use tauri::Manager;
 use tauri_plugin_dialog::{DialogExt, MessageDialogButtons};
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)

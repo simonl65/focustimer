@@ -9,13 +9,11 @@
   import { settings } from '$lib/state/settings.svelte';
 
   let activePanel = $state<'none' | 'settings' | 'help'>('none');
-  let debugMessage = $state('');
 
   onMount(() => {
     timer.onCompleteCallback = async () => {
-      
       if (settings.soundEnabled) {
-        playBeep();
+        settings.playSoundFile(settings.selectedSound);
       }
 
       setTimeout(async () => {
@@ -28,16 +26,6 @@
     };
   });
 
-  async function playBeep() {
-    try {
-      const fileName = `/${settings.selectedSound}`;
-      const audio = new Audio(fileName);
-      await audio.play();
-    } catch (e) {
-      debugMessage = "Audio Error: " + e;
-    }
-  }
-
   let isFlashing = $state(false);
   function flashUI() {
     isFlashing = true;
@@ -49,22 +37,25 @@
 
 <div class="app-container" class:flashing={isFlashing}>
   <header>
-    <button class="icon-btn" onclick={() => activePanel = 'help'} title="Help">?</button>
+    <button class="icon-btn" onclick={() => (activePanel = 'help')} title="Help"
+      >?</button>
     <h1>&nbsp;FOCUS</h1>
-    <button class="icon-btn" onclick={() => activePanel = 'settings'} title="Settings">⚙</button>
+    <button
+      class="icon-btn"
+      onclick={() => (activePanel = 'settings')}
+      title="Settings">⚙</button>
   </header>
 
   <CircularSelector />
   <Controls />
-  <p style="font-size: 0.8rem; opacity: 0.5;">{debugMessage}</p>
 
   {#if activePanel !== 'none'}
-    <div class="overlay" onclick={() => activePanel = 'none'}>
+    <div class="overlay" onclick={() => (activePanel = 'none')}>
       <div class="panel-wrapper" onclick={(e) => e.stopPropagation()}>
         {#if activePanel === 'settings'}
-          <Settings onclose={() => activePanel = 'none'} />
+          <Settings onclose={() => (activePanel = 'none')} />
         {:else if activePanel === 'help'}
-          <Help onclose={() => activePanel = 'none'} />
+          <Help onclose={() => (activePanel = 'none')} />
         {/if}
       </div>
     </div>
@@ -139,7 +130,11 @@
   }
 
   @keyframes flash-bg {
-    from { background-color: var(--bg-color); }
-    to { background-color: var(--primary-color); }
+    from {
+      background-color: var(--bg-color);
+    }
+    to {
+      background-color: var(--primary-color);
+    }
   }
 </style>
